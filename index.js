@@ -18,3 +18,4 @@ mongoose.connect('mongodb://localhost/store', { useNewUrlParser: true, useUnifie
     .catch((err) => { console.log(err.message) })
 //WEB SERVER     
 app.listen(5000, () => { console.log('running on 5000') })
+//bla
