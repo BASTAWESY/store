@@ -106,7 +106,8 @@ router.put('/:id', async (req, res) => {
     try {
         const newItem = {
             name: req.body.name,
-            cost: req.body.cost
+            cost: req.body.cost  ,
+            category : req.body.category
         }
         const result = Joi.validate(req.body, joiItemSchema)
         if (!result.error) {
