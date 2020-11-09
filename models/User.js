@@ -16,7 +16,21 @@ const userSchema = new mongoose.Schema({
         enum: ['admin', 'shop owner', 'cashier'],
         min: 3,
         max: 50,
-        required : true
+        required: true
+    },
+    mail: {
+        type: String,
+        required: true,
+        unique: true,
+        min: 10,
+        max: 255
+    },
+    password: {
+        type: String,
+        required: true,
+        unique: true,
+        min: 10,
+        max: 255
     },
     date: {
         type: Date,
@@ -25,36 +39,32 @@ const userSchema = new mongoose.Schema({
     }
 })
 const User = mongoose.model('User', userSchema)
-const user = new User({
-    name: "mostafa",
-    rule: 'cashier'
-})
-async function saving() {
-    try {
-        const result = await user.save()
-        console.log(result)
-    }
-    catch (ex) {
-        console.log(ex.error)
-    }
-}
-saving()
+
 //CREATE JOI SCHEMA
 const joiUserSchema = Joi.object().keys({
     name: Joi.string().required().min(3).max(30),
-    rule: Joi.string().required()
+    rule: Joi.string().required(),
+    mail: Joi.string().max(255).min(10).required(),
+    password: Joi.string().max(255).min(10).required()
 })
 
-//create one rule
+//create registration
 router.post('/', async (req, res) => {
     const result = Joi.validate(req.body, joiUserSchema)
     if (!result.error) {
-        const myUser = new User({
-            name: req.body.name,
-            rule: req.body.rule
-        })
-        await myUser.save()
-        res.send(myUser)
+        const userCheck = await User.findOne({ mail: req.body.mail })
+        if (userCheck)
+            res.status(400).send('this mail already registerd here ..!!')
+        else if (!userCheck) {
+            const myUser = new User({
+                name: req.body.name,
+                rule: req.body.rule,
+                mail: req.body.mail,
+                password: req.body.password
+            })
+            await myUser.save()
+            res.send(myUser)
+        }
     }
     else if (result.error)
         res.status(400).send(result.error['details'][0].message)
